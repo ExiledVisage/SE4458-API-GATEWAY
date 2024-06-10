@@ -21,6 +21,17 @@ var builder = WebApplication.CreateBuilder(args);
     }
   }
 });*/
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddReverseProxy()
@@ -67,25 +78,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-/*app.Use(async (context, next) => debugTool
-{
-    if (context.User.Identity.IsAuthenticated)
-    {
-        foreach (var claim in context.User.Claims)
-        {
-            app.Logger.LogInformation($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-        }
-
-        var roleClaim = context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-        var role = roleClaim?.Value;
-        app.Logger.LogInformation($"User is authenticated with role: {role}");
-    }
-    else
-    {
-        app.Logger.LogInformation("User is not authenticated");
-    }
-    await next.Invoke();
-});*/
+app.UseCors("AllowReactApp");
 
 app.MapReverseProxy();
 
